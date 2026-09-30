@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>com.etl</groupId>
+	<artifactId>etl_tool</artifactId>
+	<version>0.0.1</version>
+	<name>etl_tool</name>
+	<description>ETL Tool using Apache Spark</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!--
+		Target Java 8 bytecode so one jar runs on Java 8, 11 and 17, matching what the
+		Scala build emitted. Use release rather than source/target: it compiles against
+		the Java 8 API, so a Java 9+ method fails the build instead of throwing
+		NoSuchMethodError on a Java 8 runtime.
+		-->
+		<maven.compiler.release>8</maven.compiler.release>
+		<scala.binary.version>2.12</scala.binary.version>
+		<spark.version>3.5.0</spark.version>
+		<hadoop.version>3.3.4</hadoop.version>
+		<jackson.version>2.15.2</jackson.version>
+		<aws.sdk.version>1.11.898</aws.sdk.version>
+	</properties>
+
+	<dependencies>
+
+		<!-- ===================================================== -->
+		<!-- Spark -->
+		<!-- ===================================================== -->
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-core_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-mllib_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.spark</groupId>
+			<artifactId>spark-sql-kafka-0-10_${scala.binary.version}</artifactId>
+			<version>${spark.version}</version>
+		</dependency>
+
+		<!-- log4j 1.x API used by sidecar.Logger, bridged onto log4j2 by Spark -->
+		<dependency>
+			<groupId>org.apache.logging.log4j</groupId>
+			<artifactId>log4j-1.2-api</artifactId>
+			<version>2.20.0</version>
+		</dependency>
+
+		<!-- ===================================================== -->
+		<!-- Connectors -->
+		<!-- ===================================================== -->
+
+		<dependency>
+			<groupId>com.datastax.spark</groupId>
+			<artifactId>spark-cassandra-connector_${scala.binary.version}</artifactId>
+			<version>3.5.0</version>
+		</dependency>
+
+		<!--
+		Used for CassandraConverter#read(Class, Row), which maps a Cassandra Row to a
+		POJO by reflection instead of hand-written per-field getters. Pinned to the
+		3.4.x line (Spring Boot 2.7 generation) because it still targets Java 8, matching
+		maven.compiler.release above; the 4.x/5.x lines require Java 17.
+		-->
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-cassandra</artifactId>
+			<version>3.4.18</version>
+			<!--
+			Exclude the plain (non-shaded) driver: spark-cassandra-connector above already
+			brings java-driver-core-shaded, which relocates Guava/Netty so it doesn't clash
+			with Spark's own copies. Pulling in the unshaded java-driver-core here would put
+			two competing copies of the driver classes on the classpath.
+			-->
+			<exclusions>
+				<exclusion>
+					<groupId>com.datastax.oss</groupId>
+					<artifactId>java-driver-core</artifactId>
+				</exclusion>
+				<exclusion>
+					<groupId>com.datastax.oss</groupId>
+					<artifactId>java-driver-query-builder</artifactId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<version>8.0.23</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.databricks</groupId>
+			<artifactId>spark-xml_${scala.binary.version}</artifactId>
+			<version>0.9.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.crealytics</groupId>
+			<artifactId>spark-excel_${scala.binary.version}</artifactId>
+			<version>0.13.5</version>
+		</dependency>
+
+		<!--
+		Adding the jnr-posix dependency should resolve the
+		java.lang.NoClassDefFoundError: jnr/posix/POSIXHandler issue, because the error
+		indicates that the required jnr-posix library is missing from the runtime classpath.
+		-->
+		<dependency>
+			<groupId>com.github.jnr</groupId>
+			<artifactId>jnr-posix</artifactId>
+			<version>3.1.17</version>
+		</dependency>
+
+		<!-- ===================================================== -->
+		<!-- Hadoop / AWS -->
+		<!-- ===================================================== -->
+
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-hdfs</artifactId>
+			<version>${hadoop.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-aws</artifactId>
+			<version>${hadoop.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-client</artifactId>
+			<version>${hadoop.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.hadoop</groupId>
+			<artifactId>hadoop-common</artifactId>
+			<version>${hadoop.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-s3</artifactId>
+			<version>${aws.sdk.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-core</artifactId>
+			<version>${aws.sdk.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk-kms</artifactId>
+			<version>${aws.sdk.version}</version>
+		</dependency>
+
+		<!-- ===================================================== -->
+		<!-- Support libraries -->
+		<!-- ===================================================== -->
+
+		<!--
+		Pinned to the version Spark 3.5 is built against. The sbt build declared 2.2.3,
+		but its conflict manager resolved Spark's newer Jackson at runtime anyway.
+		-->
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-databind</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-core</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.fasterxml.jackson.core</groupId>
+			<artifactId>jackson-annotations</artifactId>
+			<version>${jackson.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.8</version>
+		</dependency>
+
+		<dependency>
+			<groupId>joda-time</groupId>
+			<artifactId>joda-time</artifactId>
+			<version>2.10.5</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.12</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.typesafe</groupId>
+			<artifactId>config</artifactId>
+			<version>1.4.1</version>
+		</dependency>
+
+	</dependencies>
+
+	<!-- ========================================================= -->
+	<!-- Build -->
+	<!-- ========================================================= -->
+
+	<build>
+
+		<finalName>${project.artifactId}-assembly-${project.version}</finalName>
+
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.11.0</version>
+				<configuration>
+					<release>${maven.compiler.release}</release>
+					<compilerArgs>
+						<!-- silence the "source value 8 is obsolete" note -->
+						<arg>-Xlint:-options</arg>
+					</compilerArgs>
+				</configuration>
+			</plugin>
+
+			<!-- Fat jar, replacing sbt-assembly -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>3.5.1</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<createDependencyReducedPom>false</createDependencyReducedPom>
+							<shadedArtifactAttached>false</shadedArtifactAttached>
+							<transformers>
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer" />
+								<transformer
+									implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+									<mainClass>Main</mainClass>
+								</transformer>
+							</transformers>
+							<filters>
+								<filter>
+									<artifact>*:*</artifact>
+									<excludes>
+										<exclude>META-INF/*.SF</exclude>
+										<exclude>META-INF/*.DSA</exclude>
+										<exclude>META-INF/*.RSA</exclude>
+										<exclude>META-INF/MANIFEST.MF</exclude>
+										<exclude>module-info.class</exclude>
+									</excludes>
+								</filter>
+							</filters>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+</project>

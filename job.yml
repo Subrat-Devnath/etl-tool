@@ -1,0 +1,38 @@
+jobs:
+  - name: aiPromptQuoteInfoClearAiFields
+    conf:
+      spark.cassandra.connection.host: devcass5.yagnaiq.in
+      spark.cassandra.auth.username: subrat
+      spark.cassandra.auth.password: Yagna123
+      spark.cassandra.read.timeout_ms: 2000000000
+      spark.cassandra.connection.timeout_ms: 2000000000
+      spark.sql.broadcastTimeout: 2000
+      spark.cassandra.connection.local_dc: dc1 
+     
+    extract:
+      - format: org.apache.spark.sql.cassandra
+        options:
+          keyspace: subrat_main
+          table: content
+
+    transform:
+
+      - filterExpression:
+          expression: instr(content_specific_data, 'usedFor') > 0
+          
+      - add:
+          col: name
+          value: subrat
+          
+      - select:
+          col:
+            - content_uuid
+
+      - debug:
+          action: data
+
+    load:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
