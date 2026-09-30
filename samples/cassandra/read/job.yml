@@ -1,0 +1,16 @@
+jobs:
+  - name: cassandra
+    conf:
+      spark.cassandra.connection.host: 172.16.83.55
+      spark.cassandra.connection.port: 9522
+      spark.cassandra.auth.username: cassandra
+      spark.cassandra.auth.password: 8XDEN92pzbgpisM54+kQBWZWQE
+
+    extract:
+      - format: org.apache.spark.sql.cassandra
+        options:
+          keyspace: apac_17082020
+          table: plan
+
+    load:
+      - format: console

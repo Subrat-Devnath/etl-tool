@@ -1,0 +1,39 @@
+jobs:
+  - name: csv
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - group:
+          col:
+            - dept
+          agg:
+            - col:
+                - name
+              agg: collect_set
+              alias: name_list
+        target: group
+
+      - add:
+          col: name-validation
+          condition: "array_contains(name_list, \"n\")"
+          value: valid
+        source: group
+
+      - filter:
+          col: name-validation
+          op: EQ
+          value: valid
+        source: group
+        target: group-filtered
+
+      - debug:
+          action: data
+        source: group
+
+      - debug:
+          action: data
+        source: group-filtered

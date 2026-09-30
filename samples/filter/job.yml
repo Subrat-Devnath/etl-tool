@@ -1,0 +1,34 @@
+jobs:
+  - name: add
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - filter:
+          col: p1
+          op: EQ
+          ref: p2
+        target: colFilter
+
+      - filter:
+          col: p1
+          op: EQ
+          value: 2
+        target: valFilter
+
+      - filterExpression:
+          expression: p1 = 1 or name = 'n2'
+        target: expressionFilter
+
+    load:
+      - format: console
+        source: colFilter
+
+      - format: console
+        source: valFilter
+
+      - format: console
+        source: expressionFilter

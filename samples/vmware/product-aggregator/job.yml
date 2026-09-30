@@ -1,0 +1,942 @@
+jobs:
+  - name: VMware Product Aggregator
+
+    extract:
+      - format: org.apache.spark.sql.kafka010.KafkaSourceProvider
+        options:
+          kafka.bootstrap.servers: g-aws-dev.yagnaiq.com:9092
+          subscribe: vmware-product-enriched
+
+    transform:
+      - add:
+          col: contractStartDate
+          ref: InstallBase.ContractStartDate
+
+      - add:
+          col: contractEndDate
+          ref: InstallBase.ContractEndDate
+
+      - add:
+          col: startDate
+          ref: QuoteLine.ProductServiceStartDate
+
+      - add:
+          col: endDate
+          ref: QuoteLine.ProductServiceEndDate
+
+      - add:
+          col: contractGroup
+          ref: InstallBase.ContractGroup
+
+      - add:
+          col: modifier
+          ref: InstallBase.ContractModifier
+
+      - add:
+          col: number
+          ref: InstallBase.ContractNumber
+
+      - struct:
+          col:
+            - modifier
+            - number
+          target: contractQuoteDetail
+
+      - add:
+          col: contractStatus
+          ref: InstallBase.ContractStatus
+
+      - add:
+          col: createdDate
+          udf:
+            function: nowTimestamp
+
+      - add:
+          col: createdDateString
+          udf:
+            function: now
+
+      - add:
+          col: createdUserId
+          ref: userId()
+
+      - add:
+          col: createdUserName
+          ref: userName()
+
+      - add:
+          col: isDelete
+          value: false
+
+      - add:
+          col: expiredDate
+          udf:
+            function: timestamp
+            col:
+              - QuoteHeader.QuoteExpiration
+
+      - add:
+          col: expiredDateString
+          ref: QuoteHeader.QuoteExpiration
+
+      - add:
+          col: ibUpdateDate
+          udf:
+            function: timestamp
+            col:
+              - InstallBase.IBRecordCreationDate
+
+      - add:
+          col: installBaseVendorId
+          value: 60
+
+      - add:
+          col: installBaseVendorName
+          value: VMware
+
+      - add:
+          col: instance
+          ref: QuoteLine.InstallBaseIdentifier
+
+      - add:
+          col: leadProductUUID
+          value: null
+
+      - add:
+          col: leadType
+          value: RENEWAL
+
+      - add:
+          col: leadUUID
+          value: null
+
+      - add:
+          col: orgBasedCustomFieldUUID
+          value: null
+
+      - add:
+          col: publishBy
+          value: null
+
+      - add:
+          col: publishDate
+          udf:
+            function: nowTimestamp
+
+      - add:
+          col: renewalStatus
+          value: null
+
+      - add:
+          col: renewalType
+          value: null
+
+      - add:
+          col: serialNumber
+          value: null
+
+      - add:
+          col: serialNumberStatus
+          value: null
+
+      - add:
+          col: recordKey
+          value: null
+
+      - add:
+          col: state
+          value: PUBLISHED
+
+      - add:
+          col: stateChangeNote
+          value: null
+
+      - add:
+          col: subContractNumber
+          value: null
+
+      - add:
+          col: vendorBasedCustomFieldUUID
+          value: null
+
+      - add:
+          col: version
+          value: 1
+
+      - add:
+          col: identifier
+          value: null
+
+      - add:
+          col: EQuotableStatus
+          value: QUOTABLE
+
+      - add:
+          col: updatedDate
+          udf:
+            function: nowTimestamp
+
+      - add:
+          col: updatedDateString
+          udf:
+            function: now
+
+      - add:
+          col: updatedUserId
+          ref: userId()
+
+      - add:
+          col: updatedUserName
+          ref: userName()
+
+      - add:
+          col: suggestedProducts
+          udf:
+            function: stringToSeq
+            params:
+              - ""
+              - ""
+
+      - add:
+          col: subTechnology
+          udf:
+            function: stringToSeq
+            params:
+              - ""
+              - ""
+
+      - add:
+          col: technology
+          udf:
+            function: stringToSeq
+            params:
+              - ""
+              - ""
+
+      - add:
+          col: productSubCategory
+          udf:
+            function: stringToSeq
+            params:
+              - ""
+              - ""
+
+      - add:
+          col: productCategory
+          ref: InstallBase.ProductCategory
+
+      - add:
+          col: serviceTermType
+          value: YEAR
+
+      - add:
+          col: description
+          ref: InstallBase.ProductDescription
+
+      - add:
+          col: quantity
+          ref: InstallBase.Quantity
+
+      - add:
+          col: productType
+          value: EQUIPMENT
+
+      - add:
+          col: configurable
+          value: false
+
+      - add:
+          col: included
+          value: false
+
+      - add:
+          col: rootId
+          ref: QuoteLine.InstallBaseIdentifier
+
+      - add:
+          col: partId
+          ref: QuoteLine.InstallBaseIdentifier
+
+      - add:
+          col: partNumber
+          ref: InstallBase.ProductSKU
+
+      - add:
+          col: vendorId
+          value: 60
+
+      - add:
+          col: vendorName
+          value: VMware
+
+      - add:
+          col: parentId
+          value: null
+
+      - add:
+          col: groupId
+          value: null
+
+      - add:
+          col: bundleId
+          value: null
+
+      - add:
+          col: configurationPath
+          value: null
+
+      - add:
+          col: serviceCode
+          value: null
+
+      - add:
+          col: serviceTerm
+          value: null
+
+      - add:
+          col: pricingDetails
+          value: null
+
+      - struct:
+          col:
+            - bundleId
+            - configurable
+            - configurationPath
+            - description
+            - groupId
+            - included
+            - parentId
+            - partId
+            - partNumber
+            - pricingDetails
+            - productCategory
+            - productSubCategory
+            - productType
+            - quantity
+            - rootId
+            - serviceCode
+            - serviceTerm
+            - serviceTermType
+            - subTechnology
+            - technology
+            - vendorId
+            - vendorName
+          target: originalProduct
+
+      - add:
+          col: suggestedProducts
+          udf:
+            function: stringToSeq
+            params:
+              - ""
+              - ""
+
+      - add:
+          col: subTechnology
+          udf:
+            function: stringToSeq
+            params:
+              - ""
+              - ""
+
+      - add:
+          col: technology
+          udf:
+            function: stringToSeq
+            params:
+              - ""
+              - ""
+
+      - add:
+          col: productSubCategory
+          udf:
+            function: stringToSeq
+            params:
+              - ""
+              - ""
+
+      - add:
+          col: productCategory
+          ref: InstallBase.ProductCategory
+
+      - add:
+          col: serviceTermType
+          value: YEAR
+
+      - add:
+          col: description
+          ref: InstallBase.SNSProductDescription
+
+      - add:
+          col: quantity
+          ref: InstallBase.Quantity
+
+      - add:
+          col: productType
+          value: SERVICE
+
+      - add:
+          col: configurable
+          value: false
+
+      - add:
+          col: included
+          value: false
+
+      - add:
+          col: rootId
+          ref: QuoteLine.InstallBaseIdentifier
+
+      - add:
+          col: partId
+          ref: QuoteLine.InstallBaseIdentifier
+
+      - add:
+          col: partNumber
+          ref: InstallBase.SnSSKU
+
+      - add:
+          col: vendorId
+          value: 60
+
+      - add:
+          col: vendorName
+          value: VMware
+
+      - add:
+          col: parentId
+          value: null
+
+      - add:
+          col: groupId
+          value: null
+
+      - add:
+          col: bundleId
+          value: null
+
+      - add:
+          col: configurationPath
+          value: null
+
+      - add:
+          col: serviceCode
+          ref: original_vendor_service_code
+
+      - add:
+          col: serviceTerm
+          value: QuoteLine.NumberOfDays
+
+      - add:
+          col: pricingDetails
+          value: null
+
+      - struct:
+          col:
+            - bundleId
+            - configurable
+            - configurationPath
+            - description
+            - groupId
+            - included
+            - parentId
+            - partId
+            - partNumber
+            - pricingDetails
+            - productCategory
+            - productSubCategory
+            - productType
+            - quantity
+            - rootId
+            - serviceCode
+            - serviceTerm
+            - serviceTermType
+            - subTechnology
+            - technology
+            - vendorId
+            - vendorName
+          target: originalService
+
+      - add:
+          col: billToParty
+          value: null
+
+      - add:
+          col: customer
+          value: null
+
+      - add:
+          col: customerIdByDistributor
+          value: null
+
+      - add:
+          col: customerIdByReseller
+          value: null
+
+      - add:
+          col: customerIdByVendor
+          value: null
+
+      - add:
+          col: expiredDate
+          value: null
+
+      - add:
+          col: expiredDateString
+          value: null
+
+      - add:
+          col: incumbentDistributor
+          value: null
+
+      - add:
+          col: incumbentDistributorIdByReseller
+          value: null
+
+      - add:
+          col: incumbentDistributorIdByVendor
+          value: null
+
+      - add:
+          col: incumbentDistributorName
+          value: null
+
+      - add:
+          col: incumbentReseller
+          value: null
+
+      - add:
+          col: incumbentResellerIdByDistributor
+          value: null
+
+      - add:
+          col: incumbentResellerIdByVendor
+          value: null
+
+      - add:
+          col: incumbentResellerType
+          value: null
+
+      - add:
+          col: installBaseCreationDateByVendor
+          value: null
+
+      - add:
+          col: installBaseLastCreationDateByVendor
+          value: null
+
+      - add:
+          col: installBaseGenerationMethod
+          value: null
+
+      - add:
+          col: installBaseProductUUID
+          value: null
+
+      - add:
+          col: installBaseSource
+          value: null
+
+      - add:
+          col: installBaseSourceIfOther
+          value: null
+
+      - add:
+          col: installBaseType
+          value: null
+
+      - add:
+          col: originalProduct
+          value: null
+
+      - add:
+          col: originalService
+          value: null
+
+      - add:
+          col: orgBasedCustomFieldUUID
+          value: null
+
+      - add:
+          col: productSupportExpiry
+          value: null
+
+      - add:
+          col: publishBy
+          value: null
+
+      - add:
+          col: publishDate
+          value: null
+
+      - add:
+          col: received
+          value: null
+
+      - add:
+          col: recordKey
+          value: null
+
+      - add:
+          col: resellerBuyMethod
+          value: null
+
+      - add:
+          col: shipToParty
+          value: null
+
+      - add:
+          col: serialNumber
+          value: null
+
+      - add:
+          col: serialNumberStatus
+          value: null
+
+      - add:
+          col: sent
+          value: null
+
+      - add:
+          col: stateChangeNote
+          value: null
+
+      - add:
+          col: subContractNumber
+          value: null
+
+      - add:
+          col: vendorBasedCustomFieldUUID
+          value: null
+
+      - add:
+          col: installBaseVendorId
+          value: 60
+
+      - add:
+          col: installBaseVendorName
+          value: VMware
+
+      - add:
+          col: isDelete
+          value: false
+
+      - add:
+          col: state
+          value: PUBLISHED
+
+      - add:
+          col: version
+          value: 1
+
+      - add:
+          col: runFromTool
+          value: true
+
+      - add:
+          col: createdDate
+          udf:
+            function: nowTimestamp
+
+      - add:
+          col: createdDateString
+          udf:
+            function: now
+
+      - add:
+          col: createdUserId
+          ref: userId()
+
+      - add:
+          col: createdUserName
+          ref: userName()
+
+      - add:
+          col: updatedDate
+          udf:
+            function: nowTimestamp
+
+      - add:
+          col: updatedDateString
+          udf:
+            function: now
+
+      - add:
+          col: updatedUserId
+          ref: userId()
+
+      - add:
+          col: contractStatus
+          ref: userName()
+
+      - add:
+          col: updatedUserName
+          ref: InstallBase.ContractStatus
+
+      - add:
+          col: customerName
+          ref: QuoteHeader.EndCustomerParty.AccountName
+
+      - add:
+          col: instance
+          ref: InstallBase.InstanceNumber
+
+      - add:
+          col: startDate
+          ref: InstallBase.InstanceStartDate
+
+      - add:
+          col: endDate
+          ref: InstallBase.InstanceEndDate
+
+      - add:
+          col: organizationId
+          ref: orgId()
+
+  Column contractEndDate = col(callUDF("StringDateToLongForExpiry", col("InstallBase.ContractEndDate")),"contractEndDate");
+  Column contractQuoteDetail = col(contractQuoteDetail(), "contractQuoteDetail");
+  Column contractStartDate = col(callUDF("StringDateToLong", col("InstallBase.ContractStartDate")),"contractStartDate");
+  Column incumbentResellerName = col(callUDF("pickNonNull", col("InstallBase.ResellerName"),callUDF("pickNonNull", callUDF("resellerData", col("InstallBase.ResellerNumber"), lit("resellerName")),lit(defaultIncumbentResellerName))),"incumbentResellerName");
+  Column installSite = col(installSite(), "installSite");
+
+      - struct:
+          col:
+            - billToParty
+            - contractEndDate
+            - contractQuoteDetail
+            - contractStartDate
+            - contractStatus
+            - createdDate
+            - createdDateString
+            - createdUserId
+            - createdUserName
+            - customer
+            - customerIdByDistributor
+            - customerIdByReseller
+            - customerIdByVendor
+            - customerName
+            - endDate
+            - expiredDate
+            - expiredDateString
+            - incumbentDistributor
+            - incumbentDistributorIdByReseller
+            - incumbentDistributorIdByVendor
+            - incumbentDistributorName
+            - incumbentReseller
+            - incumbentResellerIdByDistributor
+            - incumbentResellerIdByVendor
+            - incumbentResellerName
+            - incumbentResellerType
+            - installBaseCreationDateByVendor
+            - installBaseLastCreationDateByVendor
+            - installBaseGenerationMethod
+            - installBaseProductUUID
+            - installBaseSource
+            - installBaseSourceIfOther
+            - installBaseType
+            - installBaseVendorId
+            - installBaseVendorName
+            - installSite
+            - instance
+            - isDelete
+            - orgBasedCustomFieldUUID
+            - organizationId
+            - originalProduct
+            - originalService
+            - productSupportExpiry
+            - publishBy
+            - publishDate
+            - received
+            - recordKey
+            - resellerBuyMethod
+            - sent
+            - serialNumber
+            - serialNumberStatus
+            - shipToParty
+            - startDate
+            - state
+            - stateChangeNote
+            - subContractNumber
+            - updatedDate
+            - updatedDateString
+            - updatedUserId
+            - updatedUserName
+            - vendorBasedCustomFieldUUID
+            - version
+            - runFromTool
+          target: installBaseProduct
+
+      - struct:
+          col:
+            - EQuotableStatus
+            - contractEndDate
+            - contractGroup
+            - contractQuoteDetail
+            - contractStartDate
+            - contractStatus
+            - createdDate
+            - createdDateString
+            - createdUserId
+            - createdUserName
+            - endDate
+            - expiredDate
+            - expiredDateString
+            - ibUpdateDate
+            - identifier
+            - installBaseProduct
+            - installBaseVendorId
+            - installBaseVendorName
+            - instance
+            - isDelete
+            - leadProductUUID
+            - leadType
+            - leadUUID
+            - notQuotableReason
+            - orgBasedCustomFieldUUID
+            - originalProduct
+            - originalService
+            - publishBy
+            - publishDate
+            - recordKey
+            - renewalStatus
+            - renewalType
+            - serialNumber
+            - serialNumberStatus
+            - startDate
+            - state
+            - stateChangeNote
+            - subContractNumber
+            - suggestedProducts
+            - suggestedService()
+            - updatedDate
+            - updatedDateString
+            - updatedUserId
+            - updatedUserName
+            - vendorBasedCustomFieldUUID
+            - version
+          target: leadProduct
+          keep: true
+
+      - add:
+          col: modifier
+          ref: InstallBase.ContractModifier
+
+      - add:
+          col: number
+          ref: InstallBase.ContractNumber
+
+      - struct:
+          col:
+            - modifier
+            - number
+          target: contractQuoteDetail
+          keep: true
+
+      - add:
+          col: productOrFamily
+          ref: InstallBase.ProductSKU
+
+      - add:
+          col: numOfExistingProducts
+          ref: InstallBase.Quantity
+
+      - add:
+          col: highestVersionOfProduct
+          value: 0
+
+      - struct:
+          col:
+            - highestVersionOfProduct
+            - productOrFamily
+            - numOfExistingProducts
+          target: existingProduct
+          keep: true
+
+      - group:
+          col:
+            - QuoteHeader
+          agg:
+            - col:
+                - ExtractedQuoteNumber
+              agg: collect_set
+            - col:
+                - rawLead
+              agg: collect_list
+            - col:
+                - leadProduct
+              agg: collect_list
+              alias: leadProducts
+            - col:
+                - existingProduct
+              agg: collect_list
+              alias: existingProducts
+            - col:
+                - InstallBase.ContractNumber
+              agg: collect_list
+              alias: contractIds
+            - col:
+                - contractQuoteDetail
+              agg: collect_list
+            - col:
+                - InstallBase.EASegment
+              agg: collect_set
+              target: eaSegment
+            - col:
+                - InstallBase.ResellerNumber
+              agg: first
+              target: ResellerNumber
+            - col:
+                - InstallBase.ResellerName
+              agg: first
+              target: ResellerName
+            - col:
+                - lead_uuid
+              agg: first
+            - col:
+                - InstallBase.IBOwnerPartyNumber
+              agg: first
+              target: IBOwnerPartyNumber
+            - col:
+                - InstallBase.ProductCategory
+              agg: collect_set
+              target: ProductCategory
+            - col:
+                - tracker_transaction_id
+              agg: collect_set
+              alias: trackerTransactionIds
+
+      - struct:
+          col:
+            - quoteName
+            - digitalContentList
+            - leadProducts
+          target: Quote
+          keep: true
+
+      - struct:
+          col:
+            - leadProducts
+            - existingProducts
+            - contractIds
+            - contractQuoteDetail
+            - eaSegment
+            - ResellerNumber
+            - ResellerName
+            - lead_uuid
+            - IBOwnerPartyNumber
+            - ProductCategory
+            - trackerTransactionIds
+          target: InstallBase
+
+      - drop:
+          col:
+            - quoteName
+            - digitalContentList
+            - leadProducts
+
+    load:
+      - format: org.apache.spark.sql.kafka010.KafkaSourceProvider
+        options:
+          kafka.bootstrap.servers: g-aws-dev.yagnaiq.com:9092
+          topic: vmware-product-aggregated
+

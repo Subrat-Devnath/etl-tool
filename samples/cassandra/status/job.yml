@@ -1,0 +1,17 @@
+jobs:
+  - name: cassandra
+    conf:
+      status.callback:
+        api: http://abc.xyz/please_update_status
+        method: POST
+        params:
+          p1: v1
+          p2: v2
+        headers:
+          authorization: Bearer auth_token
+
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true

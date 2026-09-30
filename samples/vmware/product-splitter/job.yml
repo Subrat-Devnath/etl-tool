@@ -1,0 +1,29 @@
+jobs:
+  - name: VMware Product Splitter
+
+    extract:
+      - format: org.apache.spark.sql.kafka010.KafkaSourceProvider
+        options:
+          kafka.bootstrap.servers: g-aws-dev.yagnaiq.com:9092
+          subscribe: vmware-sftp
+
+    transform:
+      - xml:
+          col: payload
+
+      - explode:
+          col: QuoteLineList.QuoteLine
+
+      - add:
+          col: QuoteLine
+          ref: QuoteLineList.QuoteLine
+
+      - drop:
+          col:
+            - QuoteLineList
+
+    load:
+      - format: org.apache.spark.sql.kafka010.KafkaSourceProvider
+        options:
+          kafka.bootstrap.servers: g-aws-dev.yagnaiq.com:9092
+          topic: vmware-product-splitted

@@ -1,0 +1,20 @@
+jobs:
+  - name: union
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+      - format: com.databricks.spark.csv
+        options:
+          path: data2.csv
+          header: true
+        target: second
+
+    transform:
+      - union:
+          right: second
+
+    load:
+      - format: console

@@ -1,0 +1,25 @@
+jobs:
+  - name: cassandra
+    conf:
+      spark.cassandra.connection.host: intseed.yagnaiq.com
+      spark.cassandra.auth.username: cassandra
+      spark.cassandra.auth.password: 8XDEN92pzbgpisM54+kQBWZWQE
+
+    extract:
+      - format: org.apache.spark.sql.cassandra
+        options:
+          keyspace: apac_02062019_new
+          table: person
+
+    transform:
+      - filter:
+          col: age
+          op: LEQ
+          value: 26
+
+    load:
+      - format: org.apache.spark.sql.cassandra
+        mode: Delete
+        options:
+          keyspace: apac_02062019_new
+          table: person

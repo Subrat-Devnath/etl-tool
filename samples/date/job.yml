@@ -1,0 +1,74 @@
+jobs:
+  - name: date
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - add:
+          col: timestampDate
+          value: 1590134644000
+          udf:
+            function: date
+            params:
+              - timestamp
+
+      - add:
+          col: mmddyyyDate
+          value: 05/10/2019
+          udf:
+            function: date
+            params:
+              - MM/dd/yyyy
+
+      - add:
+          col: mmddyyTimestamp
+          udf:
+            function: timestamp
+            col:
+              - mmddyyyDate
+
+      - add:
+          col: formattedDate
+          udf:
+            function: dateToString
+            col:
+              - timestampDate
+            params:
+              - yyyy MMM dd
+
+      - add:
+          col: formattedDateWithTime
+          udf:
+            function: dateToString
+            col:
+              - timestampDate
+            params:
+              - yyyy-MM-dd hh:mm Z
+
+      - add:
+          col: parsedDate
+          udf:
+            function: date
+            col:
+              - datecol
+            params:
+              - MM/dd/yyyy
+
+      - add:
+          col: split_date
+          udf:
+            function: split
+            col:
+              - datecol
+            params:
+              - "/"
+              - 1
+
+      - debug:
+          action: schema
+
+      - debug:
+          action: data

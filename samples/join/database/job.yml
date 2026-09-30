@@ -1,0 +1,44 @@
+jobs:
+  - name: cassandra
+    conf:
+      spark.cassandra.connection.host: devseed.yagnaiq.com
+      spark.cassandra.auth.username: cassandra
+      spark.cassandra.auth.password: cassandra
+
+    extract:
+      - format: org.apache.spark.sql.cassandra
+        options:
+          keyspace: apac_01052019
+          table: lead
+
+      - format: org.apache.spark.sql.jdbc
+        target: project
+        options:
+          url: jdbc:mysql://devmysql.yagnaiq.com:3306/apac01052019
+          driver: com.mysql.jdbc.Driver
+          dbtable: project
+          user: dev
+          password: Dev@1234
+
+    transform:
+      - rename:
+          col: project_id
+          to: id
+
+      - rename:
+          col: organization_id
+          to: org_id
+
+      - filter:
+          col: customer_name
+          op: EQ
+          value: ACCRU SMITH CHILCOTT
+
+      - join:
+          col:
+            - org_id
+            - id
+          right: project
+
+    load:
+      - format: console

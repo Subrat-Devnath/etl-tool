@@ -1,0 +1,13 @@
+jobs:
+  - name: csv
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    load:
+      - format: com.databricks.spark.csv
+        options:
+          path: output
+          header: true

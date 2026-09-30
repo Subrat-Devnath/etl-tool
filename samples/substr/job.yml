@@ -1,0 +1,29 @@
+jobs:
+  - name: substr
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - add:
+          col: fqn
+          udf:
+            function: split
+            col:
+              - email
+            params:
+              - "@"
+              - 1
+      - add:
+          col: tld
+          udf:
+            function: split
+            col:
+              - fqn
+            params:
+              - "\\."
+              - 0
+      - debug:
+          action: data

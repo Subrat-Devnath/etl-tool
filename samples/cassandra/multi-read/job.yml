@@ -1,0 +1,28 @@
+jobs:
+  - name: cassandra
+
+    extract:
+      - format: org.apache.spark.sql.cassandra
+        options:
+          keyspace: apac_13052020
+          table: plan
+          spark.cassandra.connection.host: devseed.yagnaiq.com
+          spark.cassandra.auth.username: cassandra
+          spark.cassandra.auth.password: cassandra
+        target: cass1
+
+      - format: org.apache.spark.sql.cassandra
+        options:
+          keyspace: apac_24052020
+          table: yagna_subscription_event
+          spark.cassandra.connection.host: devseed.yagnaiq.com
+          spark.cassandra.auth.username: cassandra
+          spark.cassandra.auth.password: cassandra
+        target: cass2
+
+
+    load:
+      - format: console
+        source: cass1
+      - format: console
+        source: cass2

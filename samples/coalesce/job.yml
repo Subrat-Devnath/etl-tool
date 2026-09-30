@@ -1,0 +1,55 @@
+jobs:
+  - name: coalesce
+    extract:
+      - format: jdbc
+        options:
+          url: jdbc:mysql://devmysql.yagnaiq.com:3306/apac01052019
+          driver: com.mysql.jdbc.Driver
+          dbtable: project
+          user: dev
+          password: Dev@1234
+
+      - format: jdbc
+        target: user
+        options:
+          url: jdbc:mysql://devmysql.yagnaiq.com:3306/apac01052019
+          driver: com.mysql.jdbc.Driver
+          dbtable: user
+          user: dev
+          password: Dev@1234
+
+    transform:
+      - drop:
+          col:
+            - state
+            - org_id
+
+      - rename:
+          col: id
+          to: created_by
+        source: user
+
+      - join:
+          col:
+            - created_by
+          right: user
+
+    load:
+      - format: com.databricks.spark.csv
+        coalesce: 0
+        options:
+          path: partitioned
+
+      - format: com.databricks.spark.csv
+        options:
+          path: single
+
+      - format: com.databricks.spark.csv
+        coalesce: 2
+        options:
+          path: forced
+
+      - format: com.databricks.spark.csv
+        coalesce: 1000
+        options:
+          path: more

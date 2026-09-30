@@ -1,0 +1,45 @@
+jobs:
+  - name: csv
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+      - format: com.databricks.spark.csv
+        options:
+          path: address.csv
+          header: true
+        target: address
+
+    transform:
+      - join:
+          right: address
+          col:
+            - id
+        target: inner
+
+      - join:
+          right: address
+          col:
+            - id
+          joinType: left_outer
+        target: left
+
+      - join:
+          right: address
+          col:
+            - id
+          joinType: right_outer
+        target: right
+
+      - debug:
+          action: data
+        source: inner
+
+      - debug:
+          action: data
+        source: left
+
+      - debug:
+          action: data
+        source: right

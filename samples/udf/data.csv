@@ -1,0 +1,5 @@
+id,name,age,city,untrimmed,datecol
+1,n1,26,pune|mumbai, leading,05/10/2019
+2,n2,29,delhi|nagpur,trailing,13/13/2019
+3,n3,0,beijing|london, both,
+4,n4,,paris,,02/29/2020

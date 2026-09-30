@@ -1,0 +1,54 @@
+jobs:
+  - name: col_to_json
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - struct:
+          col:
+            - address
+            - zipcode
+          target: full_address
+          keep: true
+
+      - struct:
+          col:
+            - name
+            - full_address
+          target: person
+          keep: true
+
+      - group:
+          col:
+            - age
+          agg:
+            - col:
+                - person
+              agg: collect_set
+
+      - struct:
+          col:
+            - age
+            - person
+          target: person_list
+          keep: true
+
+      - add:
+          col: struct_as_json
+          udf:
+            function: col_to_json
+            col:
+             - person_list
+
+      - add:
+          col: array_as_json
+          udf:
+            function: col_to_json
+            col:
+              - person
+
+      - debug:
+          action: data

@@ -1,0 +1,36 @@
+jobs:
+  - name: csv
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - add:
+          col: name-validation
+          condition: isnull(name)
+          value: Name is empty
+
+      - add:
+          col: age-validation
+          condition: isnull(age)
+          value: Age is empty
+
+      - add:
+          col: age-nan-validation
+          condition: cast(age as double) is null
+          value: Age is not a number
+
+      - add:
+          col: age-final-validation
+          condition: isnull(age) or cast(age as double) is null
+          value: Age is invalid
+
+      - add:
+          col: row-validation
+          condition: isnull(name) or isnull(age) or cast(age as double) is null
+          value: row is invalid
+
+    load:
+      - format: console

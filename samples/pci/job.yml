@@ -1,0 +1,60 @@
+jobs:
+  - name: consolidate
+
+    extract:
+      - format: com.crealytics.spark.excel
+        options:
+          path: PCI.xlsx
+          useHeader: true
+
+    transform:
+      - rename:
+          col: "Customer Name "
+          to: customerName
+
+      - rename:
+          col: Vendor Name
+          to: vendorId
+
+      - rename:
+          col: Address
+          to: addressLine1
+
+      - struct:
+          col:
+            - addressLine1
+          target: address
+
+      - struct:
+          col:
+            - address
+          target: contact
+
+      - struct:
+          col:
+            - contact
+          target: customerParty
+
+      - struct:
+          col:
+            - customerName
+            - vendorId
+            - customerParty
+          target: PartnerCustomerInfo
+
+      - drop:
+          col:
+            - Customer Type
+            - Customer Email
+            - customerName
+            - vendorId
+            - addressLine1
+            - address
+            - contact
+            - customerParty
+
+    load:
+      - format: org.apache.spark.sql.json
+        options:
+          path: data.json
+          multiline: true

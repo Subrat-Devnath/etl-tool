@@ -1,0 +1,38 @@
+jobs:
+  - name: ReportDataupdate
+    conf:
+      spark.cassandra.connection.host: dryseed.yagnaiq.com
+      spark.cassandra.auth.username: cassandra
+      spark.cassandra.auth.password: 8XDEN92pzbgpisM54+kQBWZWQE
+
+    extract:
+      - format: org.apache.spark.sql.cassandra
+        options:
+          keyspace: apac_13052020
+          table: deal_registration
+    transform:
+      - filter:
+          col: deal_uuid
+          op: EQ
+          value: 32a48e09-1642-491c-bda5-a532fc482c93
+      - select:
+          col:
+            - deal_uuid
+            - rejected_products
+            - pending_products
+            - project_list_value
+      - debug:
+          action: data
+      - fromjson:
+          col: rejected_products
+          rootArray: true
+      - explode:
+          col: rejected_products
+      - select:
+          col:
+            - deal_uuid
+            - rejected_products.*
+            - pending_products
+            - project_list_value
+      - debug:
+          action: data

@@ -1,0 +1,20 @@
+jobs:
+  - name: csv
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - debug:
+          action: data
+
+      - debug:
+          action: schema
+
+      - debug:
+          action: count
+
+    load:
+      - format: console

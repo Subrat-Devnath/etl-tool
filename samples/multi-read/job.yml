@@ -1,0 +1,22 @@
+jobs:
+  - name: multi-read
+
+    extract:
+      - format: csv
+        options:
+          path: file1.csv
+          header: true
+      - format: csv
+        target: data2
+        options:
+          path: file2.csv
+          header: true
+
+    transform:
+      - join:
+          right: data2
+          col:
+            - name
+
+    load:
+      - format: console

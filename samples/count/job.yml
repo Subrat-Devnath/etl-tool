@@ -1,0 +1,28 @@
+jobs:
+  - name: rows
+    extract:
+      - format: com.crealytics.spark.excel
+        options:
+          path: TestTemplate.xlsx
+          useHeader: true
+    transform:
+      - count:
+          col: count
+        target: countds
+      - debug:
+          action: data
+        source: countds
+
+  - name: empty
+    extract:
+      - format: com.crealytics.spark.excel
+        options:
+          path: TestTemplateEmpty.xlsx
+          useHeader: true
+    transform:
+      - count:
+          col: count
+        target: countds
+      - debug:
+          action: data
+        source: countds

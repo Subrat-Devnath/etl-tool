@@ -1,0 +1,41 @@
+jobs:
+  - name: udf
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - group:
+          col:
+            - dept
+          agg:
+            - col:
+                - id
+                - name
+                - age
+              agg: collect_set
+              alias: data
+        target: exploded
+
+      - explode:
+          col: data
+        source: exploded
+
+      - explode:
+          col: name
+
+      - debug:
+          action: schema
+
+      - debug:
+          action: data
+
+      - debug:
+          action: schema
+        source: exploded
+
+      - debug:
+          action: data
+        source: exploded

@@ -1,0 +1,18 @@
+jobs:
+  - name: struct
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - struct:
+          col:
+            - name
+            - age
+          target:
+            info
+
+    load:
+      - format: console

@@ -1,0 +1,6 @@
+id,name,age
+1,n1,26
+2,n2,29
+3,n3,invalid
+4,n3,
+5,,30

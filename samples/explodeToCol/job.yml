@@ -1,0 +1,23 @@
+jobs:
+  - name: udf
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - struct:
+          col:
+            - id
+            - name
+            - age            
+          target: structCol
+          keep: false
+
+      - explodeToCol:
+          col: structCol
+          keep: false
+ 
+      - debug:
+          action: data

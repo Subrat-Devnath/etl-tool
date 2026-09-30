@@ -1,0 +1,20 @@
+jobs:
+  - name: excel
+    conf:
+      spark.cassandra.connection.host: devcass8.yagnaiq.in
+      spark.cassandra.auth.username: nilesh
+      spark.cassandra.auth.password: Yagna123
+
+    metadata:
+      cql.keyspace: kb_us
+      env.profile: NA
+      
+    extract:
+      - format: com.crealytics.spark.excel
+        options:
+          path: s3a://dry-repo/media/Repo/data.xlsx
+          header: true
+          useHeader: true
+
+    load:
+      - format: console

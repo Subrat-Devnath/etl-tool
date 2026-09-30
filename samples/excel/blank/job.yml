@@ -1,0 +1,16 @@
+jobs:
+  - name: excel
+
+    extract:
+      - format: com.crealytics.spark.excel
+        options:
+          path: data.xlsx
+          header: true
+          useHeader: true
+          
+    load:
+      - format: com.crealytics.spark.excel
+        options:
+          path: output.xlsx
+          header: true
+          useHeader: true

@@ -1,0 +1,31 @@
+jobs:
+  - name: udf
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - checksum:
+          col:
+            - id
+            - name
+          exclude: true
+          target: checksumColFor2Column1
+
+      - checksum:
+          col:
+            - age
+            - dept
+          target: checksumColFor2Column2
+
+      - checksum:
+          exclude: false
+          target: checksumForCompleteRow
+
+      - checksum:
+          target: checksumForCompleteRow
+
+      - debug:
+          action: data

@@ -1,0 +1,18 @@
+jobs:
+  - name: csv
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - add:
+          col: upper_name
+          udf:
+            function: ucase
+            col:
+              - name
+
+    load:
+      - format: console

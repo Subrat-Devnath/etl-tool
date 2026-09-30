@@ -1,0 +1,77 @@
+jobs:
+  - name: VMware lead enchricher
+    conf:
+      spark.cassandra.connection.host: devseed.yagnaiq.com
+      spark.cassandra.auth.username: cassandra
+      spark.cassandra.auth.password: cassandra
+
+    extract:
+      - format: org.apache.spark.sql.kafka010.KafkaSourceProvider
+        options:
+          kafka.bootstrap.servers: g-aws-dev.yagnaiq.com:9092
+          subscribe: vmware-product-splitted
+      - format: org.apache.spark.sql.cassandra
+        options:
+          keyspace: apac_24052020
+          table: product
+        target: product
+
+    transform:
+      - add:
+          col: ExtractedQuoteNumber
+          udf:
+            function: split
+            col:
+              - QuoteHeader.QuoteNumber
+            params:
+              - "-"
+              - 0
+
+      - filter:
+          col: vendor_id
+          op: EQ
+          value: 60
+        source: product
+
+      - filter:
+          col: product_type
+          op: EQ
+          value: MAINTENANCE
+        source: product
+
+      - group:
+          col:
+            - product_part_number
+          agg:
+            - col:
+                - vendor_service_code
+              agg: first
+        source: product
+
+      - add:
+          col: product_part_number
+          ref: QuoteLine.ServiceSKUID
+
+      - join:
+          right: product
+          col:
+            - product_part_number
+          joinType: left_outer
+
+      - rename:
+          col: product_part_number
+          to: product_part_number_renewal
+
+      - rename:
+          col: vendor_service_code
+          to: renewal_vendor_service_code
+
+      - add:
+          col: renewal_vendor_service_code
+          condition: coalesce(renewal_vendor_service_code, "Renewal")
+
+    load:
+      - format: org.apache.spark.sql.kafka010.KafkaSourceProvider
+        options:
+          kafka.bootstrap.servers: g-aws-dev.yagnaiq.com:9092
+          topic: vmware-product-enriched

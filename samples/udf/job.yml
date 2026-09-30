@@ -1,0 +1,198 @@
+skipErrors: true
+jobs:
+  - name: udf
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - add:
+          col: boolean
+          value: true
+          udf:
+            function: boolean
+
+      - add:
+          col: double
+          value: 2.0
+          udf:
+            function: double
+
+      - add:
+          col: int
+          value: 5
+          udf:
+            function: int
+
+      - add:
+          col: long
+          value: 22
+          udf:
+            function: long
+
+      - add:
+          col: timestampDate
+          value: 1560124799000
+          udf:
+            function: date
+            params:
+              - timestamp
+
+      - add:
+          col: mmddyyyDate
+          value: 05/10/2019
+          udf:
+            function: date
+            params:
+              - MM/dd/yyyy
+
+      - add:
+          col: mmddyyTimestamp
+          udf:
+            function: timestamp
+            col:
+              - mmddyyyDate
+
+      - add:
+          col: formattedDate
+          udf:
+            function: dateToString
+            col:
+              - timestampDate
+            params:
+              - yyyy MMM dd
+
+      - add:
+          col: parsedDate
+          udf:
+            function: date
+            col:
+              - datecol
+            params:
+              - MM/dd/yyyy
+
+      - group:
+          col:
+            - boolean
+          agg:
+            - col:
+                - id
+              agg: collect_set
+              alias: id_list
+        target: group
+
+      - join:
+          col:
+            - boolean
+          right: group
+
+      - add:
+          col: seqToCSV
+          udf:
+            function: seqToString
+            col:
+              - id_list
+            params:
+              - ", "
+
+      - struct:
+          col:
+            - boolean
+            - double
+            - formattedDate
+            - age
+            - seqToCSV
+          target:
+            struct
+          keep: true
+
+
+      - add:
+          col: structToCSV
+          udf:
+            function: structToString
+            col:
+              - struct
+            params:
+              - ","
+
+      - add:
+          col: stringToSeq
+          udf:
+            function: stringToSeq
+            col:
+              - city
+            params:
+              - "\\|" #as we are using pipe, we need to escape it. For other separators, we may not require escape backslashes.
+
+      - explode:
+          col: stringToSeq
+
+      - add:
+          col: trimmed
+          udf:
+            function: trim
+            col:
+              - untrimmed
+
+      - add:
+          col: replace_city
+          udf:
+            function: replace
+            col:
+              - city
+            params:
+              - "\\|"
+              - ","
+
+      - add:
+          col: null_col
+
+      - add:
+          col: split_date
+          udf:
+            function: split
+            col:
+              - datecol
+            params:
+              - "/"
+              - 1
+
+      - add:
+          col: random_uuid
+          udf:
+            function: uuid
+
+      - add:
+          col: random_id
+          udf:
+            function: id
+
+      - add:
+          col: ageLong
+          udf:
+            function: long
+            col:
+              - age
+
+      - add:
+          col: ageDouble
+          udf:
+            function: double
+            col:
+              - age
+
+      - add:
+          col: ageInt
+          udf:
+            function: int
+            col:
+              - age
+
+      - debug:
+          action: schema
+
+      - debug:
+          action: data

@@ -1,0 +1,13 @@
+jobs:
+  - name: distinct
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - distinct: {}
+
+    load:
+      - format: console

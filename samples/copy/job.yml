@@ -1,0 +1,21 @@
+jobs:
+  - name: copy
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - select:
+          col:
+            - name
+            - id
+        target: newData
+
+      - debug:
+          action: data
+
+      - debug:
+          action: data
+        source: newData

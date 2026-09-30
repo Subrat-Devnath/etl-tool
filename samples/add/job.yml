@@ -1,0 +1,58 @@
+jobs:
+  - name: add
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - add:
+          col: doubleAge
+          condition: age * 2
+
+      - add:
+          col: conditionalAge
+          condition: CASE WHEN age < 20 THEN age * 2 ELSE age * 3 END
+
+      - add:
+          col: newName
+          condition: CASE WHEN name == 'n1' THEN 'a1' WHEN name == 'n2' THEN 'a2' END
+
+      - add:
+          col: fromAnotherCol
+          ref: name
+      - add:
+          col: fromConstant
+          value: 10
+      - add:
+          col: fromUdf
+          udf:
+             function: uuid
+
+      - struct:
+          target: multilevel
+          col:
+            - name
+          keep: true
+      - struct:
+          target: child1
+          col:
+            - name
+          keep: true
+      - add:
+          col: multilevel.child1
+          ref: child1
+      - drop:
+          col:
+            - child1
+
+      - add:
+          col: multilevel.child1.child2
+          ref: name
+
+      - debug:
+          action: schema
+
+      - debug:
+          action: data

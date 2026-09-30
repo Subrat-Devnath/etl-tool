@@ -1,0 +1,10 @@
+jobs:
+  - name: json
+    extract:
+      - format: org.apache.spark.sql.json
+        options:
+          path: data.json
+          multiline: true
+
+    load:
+      - format: console

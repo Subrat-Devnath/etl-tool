@@ -1,0 +1,13 @@
+jobs:
+  - name: mysql
+    extract:
+      - format: org.apache.spark.sql.jdbc
+        options:
+          url: jdbc:mysql://devmysql.yagnaiq.com:3306/cnet_02042019
+          driver: com.mysql.jdbc.Driver
+          dbtable: cds_distivoc
+          user: dev
+          password: Dev@1234
+
+    load:
+      - format: console

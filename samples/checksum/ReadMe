@@ -1,0 +1,28 @@
+1) First Case When you want checksum of some particular column, then use following approach, 
+   value of exlude: true denotes we want to consider all column excluding mention colun in col, if exclude is not given mean false
+
+      - checksum:
+          col:
+            - id
+            - name
+          exlude: true
+          target: checksumColFor2Column1
+
+      - checksum:
+          col:
+            - age
+            - dept
+          target: checksumColFor2Column2
+
+
+
+1) Second Case When you want checksum of all column in row, then use following approach, 
+   if value is col is not given, by default it calculate checksum for all columns in dataset,
+   value of row should be false or not given is also ok, 
+
+      - checksum:
+          exlude: false
+          target: checksumForCompleteRow
+
+      - checksum:
+          target: checksumForCompleteRow

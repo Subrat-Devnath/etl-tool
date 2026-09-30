@@ -1,0 +1,65 @@
+jobs:
+  - name: sort
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - debug:
+          action: data
+
+      - sort:
+          col: name
+          order: asc
+        target: asc
+
+      - debug:
+          action: data
+        source: asc
+
+      - sort:
+          col: name
+          order: asc_nulls_first
+        target: asc_nulls_first
+
+      - debug:
+          action: data
+        source: asc_nulls_first
+
+      - sort:
+          col: name
+          order: asc_nulls_last
+        target: asc_nulls_last
+
+      - debug:
+          action: data
+        source: asc_nulls_last
+
+      - sort:
+          col: name
+          order: desc
+        target: desc
+
+      - debug:
+          action: data
+        source: desc
+
+      - sort:
+          col: name
+          order: desc_nulls_first
+        target: desc_nulls_first
+
+      - debug:
+          action: data
+        source: desc_nulls_first
+
+      - sort:
+          col: name
+          order: desc_nulls_last
+        target: desc_nulls_last
+
+      - debug:
+          action: data
+        source: desc_nulls_last

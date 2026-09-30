@@ -1,0 +1,14 @@
+jobs:
+  - name: write kafka
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    load:
+      - format: org.apache.spark.sql.kafka010.KafkaSourceProvider
+        options:
+          kafka.bootstrap.servers: g-dev.yagnaiq.com:9092
+          topic: etl-batch-add
+

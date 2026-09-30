@@ -1,0 +1,16 @@
+jobs:
+  - name: csv
+    extract:
+      - format: com.databricks.spark.csv
+        options:
+          path: data.csv
+          header: true
+
+    transform:
+      - select:
+          col:
+            - id
+            - name
+
+    load:
+      - format: console
