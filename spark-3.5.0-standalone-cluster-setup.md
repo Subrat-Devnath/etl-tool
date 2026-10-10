@@ -47,19 +47,19 @@ java -version
 
 ```bash
 cd /opt
-sudo wget https://archive.apache.org/dist/spark/spark-3.5.0/spark-3.5.0-bin-hadoop3.tgz
+sudo wget https://archive.apache.org/dist/spark/spark-3.5.0/spark-3.5.0-bin-without-hadoop.tgz
 ```
 
 Extract:
 
 ```bash
-sudo tar -xzf spark-3.5.0-bin-hadoop3.tgz
+sudo tar -xzf spark-3.5.0-bin-without-hadoop.tgz
 ```
 
 Rename for convenience:
 
 ```bash
-sudo mv spark-3.5.0-bin-hadoop3 spark
+sudo mv spark-3.5.0-bin-without-hadoop spark
 ```
 
 Fix ownership so the current user can manage it without `sudo`:
