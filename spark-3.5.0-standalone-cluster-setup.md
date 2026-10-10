@@ -21,18 +21,17 @@
 
 ## 1. Check Java
 
-Spark 3.5.0 supports Java 8, 11, and 17. For a Java-based ETL project, **Java 17** is
-the recommended choice.
+Spark 3.5.0 supports Java 8, 11, and 17. For this setup, **Java 8** is used.
 
 ```bash
 java -version
 ```
 
-If Java 17 is not installed:
+If Java 8 is not installed:
 
 ```bash
 sudo apt update
-sudo apt install openjdk-17-jdk -y
+sudo apt install openjdk-8-jdk -y
 ```
 
 Verify:
@@ -81,7 +80,7 @@ Add the following lines:
 ```bash
 export SPARK_HOME=/opt/spark
 export PATH=$PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 ```
 
 Reload the shell config:
@@ -121,7 +120,7 @@ nano spark-env.sh
 Example for a VM with **4 CPU / 8 GB RAM**:
 
 ```bash
-export JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
+export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
 
 export SPARK_MASTER_HOST=<VM_PRIVATE_IP>
 export SPARK_MASTER_PORT=7077
